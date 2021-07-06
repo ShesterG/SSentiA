@@ -37,24 +37,29 @@ class LexicalAnalyzer(object):
         return X, Y
     
     
-    def write_CSV(self, X_data, Y_label, Y_prediction, confidence_scores ,category):
+    def write_CSV(self, X_data, Y_prediction, confidence_scores , pos_score, neg_score, category):
     
-        csvfile=open("/Users/russell/Downloads/bin_" + category +".csv",'w', newline='')
+        csvfile=open("/content/SSentiA/bin_" + category +".csv",'w', newline='')
         
         
         obj=csv.writer(csvfile)
         
         data= []
-        label = []
+        #label = []
         prediction = []
         confidence = []
+        pos = []
+        neg = []
+
         for i in range(len(X_data)):
             data.append(X_data[i])
-            label.append(Y_label[i])
+            #label.append(Y_label[i])
             prediction.append( Y_prediction[i])
             confidence.append(confidence_scores[i])
+            pos.append(pos_score[i])
+            neg.append(neg_score[i])
             
-        for element in zip(data, label,prediction, confidence):
+        for element in zip(data, prediction, confidence, pos, neg):
             obj.writerow(element)
             
         csvfile.close()
@@ -157,13 +162,13 @@ class LexicalAnalyzer(object):
     
     #----------- Bing Liu opinion Lexicon --------------  
     def create_polarity_dictionary_opinion_lexicon(self):
-        file = open('/Users/russell/Documents/NLP/resource/positive.txt', 'r') 
+        file = open('/content/SSentiA/positive.txt', 'r') 
         for line in file: 
             token = line.split()
             key = ''.join(token)
             dic[key] = 1
             
-        file = open('/Users/russell/Documents/NLP/resource/negative.txt', 'r') 
+        file = open('/content/SSentiA/negative.txt', 'r') 
         for line in file: 
             token = line.split()
             key = ''.join(token)
@@ -437,7 +442,7 @@ class LexicalAnalyzer(object):
         return positive_scores,negative_scores, polarity_scores, prediction_confidence_scores
           
     #----------Dataset----------
-    def distribute_predictions_into_bins(self, data, labels, predictions, confidence):
+    def distribute_predictions_into_bins(self, data, labels, positive_scores, negative_scores, predictions, confidence):
         
         print("$$$$")        
         n_conf = np.array(confidence)
@@ -461,27 +466,36 @@ class LexicalAnalyzer(object):
         very_high_label = []
         very_high_prediction = []
         very_high_confidence = []
+        very_high_positive_score = []
+        very_high_negative_score = []
         
         high_data = []
         high_label = []
         high_prediction = []
         high_confidence = []
-        
+        high_positive_score = []
+        high_negative_score = []
+
         low_data = []
         low_label = []
         low_prediction = []
         low_confidence = []
-        
-        
+        low_positive_score = []
+        low_negative_score = []
+
         very_low_data = []
         very_low_label = []
         very_low_prediction = []
         very_low_confidence = []
-        
+        very_low_positive_score = []
+        very_low_negative_score = []
+
         zero_data = []
         zero_label = []
         zero_prediction = []
         zero_confidence = []
+        zero_positive_score = []
+        zero_negative_score = []
         
         print("---->>> ",len(data), len(confidence))
         #return
@@ -490,41 +504,51 @@ class LexicalAnalyzer(object):
             conf = confidence[i]
             if conf >= bin1:
                 very_high_data.append(data[i])
-                very_high_label.append(labels[i])
+                #very_high_label.append(labels[i])
                 very_high_prediction.append(predictions[i])
                 very_high_confidence.append(confidence[i])
+                very_high_positive_score.append(positive_scores[i])
+                very_high_negative_score.append(negative_scores[i])
                 
             elif conf >= bin2:  
                 high_data.append(data[i])
-                high_label.append(labels[i])
+                #high_label.append(labels[i])
                 high_prediction.append(predictions[i])
                 high_confidence.append(confidence[i])
+                high_positive_score.append(positive_scores[i])
+                high_negative_score.append(negative_scores[i])
                 
             elif conf >= bin3:
                 low_data.append(data[i])
-                low_label.append(labels[i])
+                #low_label.append(labels[i])
                 low_prediction.append(predictions[i])
                 low_confidence.append(confidence[i])
+                low_positive_score.append(positive_scores[i])
+                low_negative_score.append(negative_scores[i])
                 
             elif conf >= bin4:
                 very_low_data.append(data[i])
-                very_low_label.append(labels[i])
+                #very_low_label.append(labels[i])
                 very_low_prediction.append(predictions[i])
                 very_low_confidence.append(confidence[i])
+                very_low_positive_score.append(positive_scores[i])
+                very_low_negative_score.append(negative_scores[i])
                 
             else:
                 zero_data.append(data[i])
-                zero_label.append(labels[i])
+                #zero_label.append(labels[i])
                 zero_prediction.append(predictions[i])
                 zero_confidence.append(confidence[i])
+                zero_positive_score.append(positive_scores[i])
+                zero_negative_score.append(negative_scores[i])
                 
        
        
-        self.write_CSV(very_high_data, very_high_label, very_high_prediction,  very_high_confidence , "1")
-        self.write_CSV(high_data, high_label, high_prediction,  high_confidence , "2")
-        self.write_CSV(low_data, low_label, low_prediction,  low_confidence , "3")
-        self.write_CSV(very_low_data, very_low_label, very_low_prediction,  very_low_confidence , "4")
-        self.write_CSV(zero_data, zero_label, zero_prediction, zero_confidence , "5")
+        self.write_CSV(very_high_data, very_high_prediction,  very_high_confidence , very_high_positive_score, very_high_negative_score, "1")
+        self.write_CSV(high_data, high_prediction,  high_confidence , high_positive_score, high_negative_score, "2")
+        self.write_CSV(low_data, low_prediction,  low_confidence , low_positive_score, low_negative_score, "3")
+        self.write_CSV(very_low_data, very_low_prediction,  very_low_confidence , very_low_positive_score, very_low_negative_score, "4")
+        self.write_CSV(zero_data, zero_prediction, zero_confidence , zero_positive_score, zero_negative_score, "5")
         
     
     
@@ -533,17 +557,17 @@ def main():
     
     lexicalAnalyzer = LexicalAnalyzer()
     
-    excel_file =  "" #"/Users/russell/Documents/NLP/Paper-2-SSentiA/Final/book_2.xlsx" #"Provide path of excel file" #
-    sheet_name = "" # "book_2" #"Provide Sheet Name"   #
+    excel_file =  "/content/ghNoLabels.xlsx" #"/Users/russell/Documents/NLP/Paper-2-SSentiA/Final/book_2.xlsx" #"Provide path of excel file" #
+    sheet_name = "ghNoLabels" # "book_2" #"Provide Sheet Name"   #
     
     data,label = lexicalAnalyzer.read_data(excel_file, sheet_name)
     
     #data = data[:15]
     #label = label[:15]
     
-    predictions, pred_confidence_scores = lexicalAnalyzer.classify_binary_dataset(data,label)
+    positive_scores,negative_scores, polarity_scores, prediction_confidence_scores = lexicalAnalyzer.classify_ternary_dataset(data)
        
-    lexicalAnalyzer.distribute_predictions_into_bins(data,label,predictions, pred_confidence_scores)
+    lexicalAnalyzer.distribute_predictions_into_bins(data, label, positive_scores, negative_scores, polarity_scores, prediction_confidence_scores)
     
          
 if __name__ == main():
