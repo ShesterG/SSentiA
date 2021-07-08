@@ -31,15 +31,15 @@ class LexicalAnalyzer(object):
         numpy_array = data.values
        # print(numpy_array)
         X = numpy_array[:,0]
-        Y = numpy_array[:,1]
+        #Y = numpy_array[:,1]
        
        
-        return X, Y
+        return X
     
     
     def write_CSV(self, X_data, Y_prediction, confidence_scores , pos_score, neg_score, category):
     
-        csvfile=open("/content/SSentiA/bin_" + category +".csv",'w', newline='')
+        csvfile=open("/content/SSentiA/AllGhTweets/bin_" + category +".csv",'w', newline='')
         
         
         obj=csv.writer(csvfile)
@@ -442,7 +442,7 @@ class LexicalAnalyzer(object):
         return positive_scores,negative_scores, polarity_scores, prediction_confidence_scores
           
     #----------Dataset----------
-    def distribute_predictions_into_bins(self, data, labels, positive_scores, negative_scores, predictions, confidence):
+    def distribute_predictions_into_bins(self, data, positive_scores, negative_scores, predictions, confidence):
         
         print("$$$$")        
         n_conf = np.array(confidence)
@@ -557,17 +557,17 @@ def main():
     
     lexicalAnalyzer = LexicalAnalyzer()
     
-    excel_file =  "/content/ghNoLabels.xlsx" #"/Users/russell/Documents/NLP/Paper-2-SSentiA/Final/book_2.xlsx" #"Provide path of excel file" #
-    sheet_name = "ghNoLabels" # "book_2" #"Provide Sheet Name"   #
+    excel_file =  "/content/SSentiA/AllGhTweets/ghNoLabels2.xlsx" #"/Users/russell/Documents/NLP/Paper-2-SSentiA/Final/book_2.xlsx" #"Provide path of excel file" #
+    sheet_name = "AllTweets" # "book_2" #"Provide Sheet Name"   #
     
-    data,label = lexicalAnalyzer.read_data(excel_file, sheet_name)
+    data = lexicalAnalyzer.read_data(excel_file, sheet_name)
     
     #data = data[:15]
     #label = label[:15]
     
     positive_scores,negative_scores, polarity_scores, prediction_confidence_scores = lexicalAnalyzer.classify_ternary_dataset(data)
        
-    lexicalAnalyzer.distribute_predictions_into_bins(data, label, positive_scores, negative_scores, polarity_scores, prediction_confidence_scores)
+    lexicalAnalyzer.distribute_predictions_into_bins(data, positive_scores, negative_scores, polarity_scores, prediction_confidence_scores)
     
          
 if __name__ == main():
